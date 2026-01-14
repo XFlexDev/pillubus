@@ -1,9 +1,9 @@
 <template>
   <div :class="['app', theme]">
     <RouterView v-slot="{ Component, route }">
-      <transition :name="transitionName">
+      <Transition :name="transitionName" mode="out-in">
         <component :is="Component" :key="route.fullPath" />
-      </transition>
+      </Transition>
     </RouterView>
 
     <BottomNav />
@@ -11,66 +11,71 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-import { useRouter } from "vue-router";
+import { watch, ref } from "vue";
+import { useRoute } from "vue-router";
 import BottomNav from "./components/BottomNav.vue";
 import { useUser } from "./composables/useUser";
 
 const { theme } = useUser();
+const route = useRoute();
+const transitionName = ref("slide-forward");
 
-const transitionName = ref("slide-left");
-const router = useRouter();
+let lastDepth = route.fullPath.split("/").length;
 
-router.beforeEach((to, from, next) => {
-  const toDepth = to.path.split("/").length;
-  const fromDepth = from.path.split("/").length;
-  transitionName.value = toDepth > fromDepth ? "slide-left" : "slide-right";
-  next();
-});
+watch(
+  () => route.fullPath,
+  (to) => {
+    const depth = to.split("/").length;
+    transitionName.value = depth >= lastDepth ? "slide-forward" : "slide-back";
+    lastDepth = depth;
+  }
+);
 </script>
 
 <style>
 .app {
   min-height: 100vh;
-  background: var(--bg);
-  color: var(--fg);
+  background: #f2f2f2;
+  color: #111;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-/* Themes */
-.app.light {
-  --bg: #ffffff;
-  --fg: #111111;
-  --card: #ffffff;
-  --muted: #666;
-}
 .app.dark {
-  --bg: #0f0f12;
-  --fg: #f2f2f2;
-  --card: #1a1b20;
-  --muted: #9aa0a6;
+  background: #0f0f0f;
+  color: #f5f5f5;
 }
 
-/* forward */
-.slide-left-enter-active,
-.slide-left-leave-active {
-  transition: transform .28s ease;
+/* ========== ROUTE TRANSITIONS ========== */
+
+.slide-forward-enter-active,
+.slide-forward-leave-active,
+.slide-back-enter-active,
+.slide-back-leave-active {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  will-change: transform, opacity;
+  transition: transform 0.35s cubic-bezier(.25,.8,.25,1),
+              opacity 0.25s ease;
 }
-.slide-left-enter-from {
+
+/* forward: new from right, old to left */
+.slide-forward-enter-from {
   transform: translateX(100%);
 }
-.slide-left-leave-to {
-  transform: translateX(-100%);
+.slide-forward-leave-to {
+  transform: translateX(-30%);
+  opacity: 0.5;
 }
 
-/* back */
-.slide-right-enter-active,
-.slide-right-leave-active {
-  transition: transform .28s ease;
+/* back: new from left, old to right */
+.slide-back-enter-from {
+  transform: translateX(-30%);
+  opacity: 0.5;
 }
-.slide-right-enter-from {
-  transform: translateX(-100%);
-}
-.slide-right-leave-to {
+.slide-back-leave-to {
   transform: translateX(100%);
 }
 </style>
