@@ -1,21 +1,57 @@
-
 import { createRouter, createWebHistory } from "vue-router";
-import TicketsBuy from "../pages/TicketsBuy.vue";
-import TicketsYour from "../pages/TicketsYour.vue";
-import SingleTicket from "../pages/SingleTicket.vue";
-import Routes from "../pages/Routes.vue";
-import More from "../pages/More.vue";
-import Settings from "../pages/Settings.vue";
 
-export default createRouter({
+// Views
+import Home from "../views/Home.vue";
+import TicketsBuy from "../views/TicketsBuy.vue";
+import SingleTicket from "../views/SingleTicket.vue";
+import YourTickets from "../views/YourTickets.vue";
+import Routes from "../views/Routes.vue";
+import More from "../views/More.vue";
+import Settings from "../views/Settings.vue";
+
+const router = createRouter({
   history: createWebHistory(),
   routes: [
-    { path: "/", redirect: "/tickets/buy" },
-    { path: "/tickets/buy", component: TicketsBuy },
-    { path: "/tickets/your", component: TicketsYour },
-    { path: "/tickets/single", component: SingleTicket },
-    { path: "/routes", component: Routes },
-    { path: "/more", component: More },
-    { path: "/settings", component: Settings }
-  ]
+    {
+      path: "/",
+      redirect: "/tickets",
+    },
+
+    {
+      path: "/home",
+      component: Home,
+    },
+
+    {
+      path: "/tickets",
+      component: TicketsBuy,
+    },
+
+    {
+      path: "/tickets/single",
+      component: SingleTicket,
+    },
+
+    {
+      path: "/tickets/yours",
+      component: YourTickets,
+    },
+
+    {
+      path: "/routes",
+      component: Routes,
+    },
+
+    {
+      path: "/more",
+      component: More,
+    },
+
+    {
+      path: "/settings",
+      component: Settings,
+    },
+  ],
 });
+
+export default router;
