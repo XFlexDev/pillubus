@@ -1,15 +1,20 @@
 <template>
-  <div class="page">
-    <div class="top">
+  <div class="page" :class="{ dim: sheetOpen }">
+    <header class="top">
       <button class="back" @click="$router.back()">‹</button>
-      <div class="title">Single ticket</div>
-    </div>
+      <div class="title">Buy a single ticket</div>
+    </header>
 
-    <!-- Zone -->
-    <section>
-      <div class="row-head" @click="toggle('zone')">
-        <span>Travel zone</span>
-        <b>{{ zone.label }}</b>
+    <!-- Rows -->
+    <section class="rows">
+      <div class="row" @click="toggle('zone')">
+        <div class="left">
+          <div class="label">Travel zone</div>
+        </div>
+        <div class="right">
+          <b>{{ zone.label }}</b>
+          <span class="chev">⌃</span>
+        </div>
       </div>
 
       <transition name="accordion">
@@ -18,20 +23,32 @@
             v-for="z in zones"
             :key="z.label"
             class="pill"
-            :class="{ active: zone.label === z.label }"
+            :class="{ active: z.label === zone.label }"
             @click="zone = z"
           >
-            {{ z.label }} · {{ z.price.toFixed(2).replace('.', ',') }} €
+            {{ z.label }} · {{ euro(z.price) }}
           </button>
         </div>
       </transition>
-    </section>
 
-    <!-- Duration -->
-    <section>
-      <div class="row-head" @click="toggle('dur')">
-        <span>Validity duration</span>
-        <b>{{ duration }} min</b>
+      <div class="row">
+        <div class="left">
+          <div class="label">Customer group</div>
+        </div>
+        <div class="right">
+          <b>Adult</b>
+          <span class="chev">⌃</span>
+        </div>
+      </div>
+
+      <div class="row" @click="toggle('dur')">
+        <div class="left">
+          <div class="label">Validity starts</div>
+        </div>
+        <div class="right">
+          <b>Now</b>
+          <span class="chev">⌃</span>
+        </div>
       </div>
 
       <transition name="accordion">
@@ -41,19 +58,49 @@
           </button>
         </div>
       </transition>
+
+      <div class="row">
+        <div class="left">
+          <div class="label">Payment method</div>
+        </div>
+        <div class="right">
+          <b>Visa</b>
+          <span class="chev">⌃</span>
+        </div>
+      </div>
+
+      <div class="duration-box">Duration {{ duration }} min</div>
     </section>
 
-    <div style="height:120px"></div>
-
+    <!-- Bottom bar -->
     <div class="bar">
-      <div class="price">{{ finalPrice }} €</div>
-      <button class="cta" @click="continuePay">Continue</button>
+      <div class="price">{{ euro(zone.price) }}</div>
+      <button class="cta" @click="openSheet">Continue</button>
     </div>
+
+    <!-- Overlay -->
+    <transition name="fade">
+      <div v-if="sheetOpen" class="overlay" @click="closeSheet"></div>
+    </transition>
+
+    <!-- Bottom sheet -->
+    <transition name="sheet">
+      <div v-if="sheetOpen" class="sheet">
+        <button class="close" @click="closeSheet">×</button>
+        <div class="sheet-content">
+          <div class="sheet-price">
+            <div class="big">{{ euro(zone.price) }}</div>
+            <div class="vat">Incl. VAT</div>
+          </div>
+          <button class="confirm" @click="confirm">Confirm payment</button>
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref } from "vue";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
@@ -73,14 +120,18 @@ const durations = [60, 80, 100, 120];
 const zone = ref(zones[0]);
 const duration = ref(80);
 const open = ref(null);
+const sheetOpen = ref(false);
 
 const toggle = (k) => (open.value = open.value === k ? null : k);
+const euro = (n) => n.toFixed(2).replace(".", ",") + " €";
 
-const finalPrice = computed(() =>
-  zone.value.price.toFixed(2).replace(".", ",")
-);
-
-function continuePay() {
+function openSheet() {
+  sheetOpen.value = true;
+}
+function closeSheet() {
+  sheetOpen.value = false;
+}
+function confirm() {
   sessionStorage.setItem(
     "pb_pending",
     JSON.stringify({
@@ -96,41 +147,56 @@ function continuePay() {
 <style scoped>
 .page {
   min-height: 100vh;
+  background: #f2f2f2;
 }
+.page.dim {
+  filter: grayscale(.1);
+}
+
 .top {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 12px 16px;
-  border-bottom: 1px solid rgba(0,0,0,.1);
+  background: #fff;
+  border-bottom: 1px solid #ddd;
 }
 .back {
-  background: none;
   border: 0;
+  background: none;
   font-size: 28px;
 }
 .title {
-  font-size: 18px;
   font-weight: 700;
 }
 
-section {
-  border-bottom: 1px solid rgba(0,0,0,.1);
+.rows {
+  background: #e6e6e6;
 }
-.row-head {
+.row {
   display: flex;
   justify-content: space-between;
-  padding: 14px 16px;
+  padding: 16px;
+  background: #e6e6e6;
+  border-bottom: 1px solid #d0d0d0;
 }
+.label {
+  color: #666;
+}
+.chev {
+  margin-left: 8px;
+}
+
 .panel {
-  padding: 10px 12px 16px;
+  padding: 12px 12px 16px;
+  background: #f2f2f2;
 }
 .pill {
   border: 0;
   border-radius: 999px;
   padding: 10px 14px;
   margin: 6px;
-  background: #f1f1f1;
+  background: #fff;
 }
 .pill.active {
   background: #007ac9;
@@ -141,33 +207,29 @@ section {
   width: 100%;
   text-align: left;
   border: 0;
-  background: none;
-  padding: 12px 8px;
-  font-size: 16px;
+  background: #fff;
+  padding: 12px;
+  margin-bottom: 6px;
+  border-radius: 8px;
 }
 
-/* Accordion */
-.accordion-enter-active,
-.accordion-leave-active {
-  transition: max-height .25s ease, opacity .2s ease;
-}
-.accordion-enter-from,
-.accordion-leave-to {
-  max-height: 0;
-  opacity: 0;
+.duration-box {
+  margin: 12px;
+  padding: 12px;
+  background: #ddd;
+  border-radius: 10px;
 }
 
-/* Bottom bar */
 .bar {
   position: fixed;
   left: 0;
   right: 0;
-  bottom: 64px; /* above BottomNav */
+  bottom: 64px;
   display: flex;
   justify-content: space-between;
   padding: 12px 16px;
-  background: var(--card);
-  border-top: 1px solid rgba(0,0,0,.1);
+  background: #fff;
+  border-top: 1px solid #ddd;
 }
 .price {
   font-size: 28px;
@@ -179,6 +241,80 @@ section {
   border: 0;
   border-radius: 12px;
   padding: 12px 20px;
-  font-size: 16px;
+}
+
+/* Overlay & sheet */
+.overlay {
+  position: fixed;
+  inset: 0;
+  backdrop-filter: blur(4px);
+  background: rgba(0,0,0,.25);
+}
+.sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #fff;
+  border-radius: 16px 16px 0 0;
+  padding: 16px;
+}
+.close {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  border: 0;
+  background: none;
+  font-size: 26px;
+}
+.sheet-content {
+  margin-top: 24px;
+  text-align: center;
+}
+.big {
+  font-size: 40px;
+  font-weight: 800;
+}
+.vat {
+  color: #666;
+}
+.confirm {
+  margin-top: 16px;
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  border: 0;
+  background: #3b7f1e;
+  color: #fff;
+  font-size: 18px;
+}
+
+/* Animations */
+.accordion-enter-active,
+.accordion-leave-active {
+  transition: max-height .25s ease, opacity .2s ease;
+}
+.accordion-enter-from,
+.accordion-leave-to {
+  max-height: 0;
+  opacity: 0;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity .2s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.sheet-enter-active,
+.sheet-leave-active {
+  transition: transform .3s cubic-bezier(.25,.8,.25,1);
+}
+.sheet-enter-from,
+.sheet-leave-to {
+  transform: translateY(100%);
 }
 </style>
