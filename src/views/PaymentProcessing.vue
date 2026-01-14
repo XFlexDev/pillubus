@@ -9,33 +9,46 @@
 <script setup>
 import { onMounted } from "vue";
 import { useRouter } from "vue-router";
+import { useTickets } from "../composables/useTickets";
 
 const router = useRouter();
+const { addTicket } = useTickets();
+
+function makeId(zone) {
+  const rand = Math.random().toString(36).slice(2, 8).toUpperCase();
+  return `PB-${new Date().getFullYear()}-${zone}-${rand}`;
+}
 
 onMounted(() => {
+  const pending = JSON.parse(sessionStorage.getItem("pb_pending") || "null");
+
   setTimeout(() => {
-    const tickets = JSON.parse(localStorage.getItem("tickets") || "[]");
-    const id = Date.now();
-
-    tickets.unshift({
-      id,
-      zone: "AB",
-      validUntil: new Date(Date.now() + 60 * 60 * 1000).toLocaleString(),
-    });
-
-    localStorage.setItem("tickets", JSON.stringify(tickets));
-    router.replace(`/tickets/yours?new=${id}`);
-  }, 1800);
+    if (pending) {
+      const now = Date.now();
+      const id = makeId(pending.zone);
+      const ticket = {
+        id,
+        zone: pending.zone,
+        duration: pending.duration,
+        createdAt: now,
+        validUntil: now + pending.duration * 60_000,
+      };
+      addTicket(ticket);
+      sessionStorage.removeItem("pb_pending");
+      router.replace(`/tickets?new=${id}`);
+    } else {
+      router.replace("/");
+    }
+  }, 1400);
 });
 </script>
 
 <style scoped>
 .pay {
   height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  place-items: center;
+  text-align: center;
 }
 .spinner {
   width: 48px;
@@ -44,9 +57,7 @@ onMounted(() => {
   border-top-color: #007ac9;
   border-radius: 50%;
   animation: spin .8s linear infinite;
-  margin-bottom: 16px;
+  margin: 0 auto 16px;
 }
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
+@keyframes spin { to { transform: rotate(360deg); } }
 </style>
