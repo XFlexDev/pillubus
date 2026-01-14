@@ -1,14 +1,11 @@
 import { createRouter, createWebHistory } from "vue-router";
 import TicketsBuy from "../views/TicketsBuy.vue";
+import SingleTicket from "../views/SingleTicket.vue";
 
-const router = createRouter({
+export default createRouter({
   history: createWebHistory(),
   routes: [
-    {
-      path: "/",
-      component: TicketsBuy,
-    },
+    { path: "/", component: TicketsBuy },
+    { path: "/single", component: SingleTicket },
   ],
 });
-
-export default router;
