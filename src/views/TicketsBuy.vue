@@ -1,15 +1,10 @@
 <template>
   <div class="wrap">
-    <!-- Top tabs -->
-    <div class="tabs">
-      <button class="tab active">Buy a ticket</button>
-      <button class="tab ghost">Your tickets</button>
-      <div class="underline"></div>
-    </div>
+    <header class="head">
+      <div class="hi">Hi, {{ name }}</div>
+      <h1>Buy a ticket</h1>
+    </header>
 
-    <h1 class="title">Buy a ticket</h1>
-
-    <!-- Main cards -->
     <div class="cards">
       <button class="card blue" @click="$router.push('/single')">
         <div class="icon">⏱</div>
@@ -19,99 +14,69 @@
         </div>
       </button>
 
-      <button class="card blue">
+      <button class="card ghost" disabled>
         <div class="icon">10×</div>
         <div class="text">
-          <div class="name">Multi-journey ticket</div>
-          <div class="desc">Buy 10 or 20 single tickets in one go</div>
+          <div class="name">Multi-journey</div>
+          <div class="desc">Coming soon</div>
         </div>
       </button>
 
-      <button class="card blue">
+      <button class="card ghost" disabled>
         <div class="icon">📅</div>
         <div class="text">
           <div class="name">Day ticket</div>
-          <div class="desc">1 – 13 days</div>
+          <div class="desc">Coming soon</div>
         </div>
       </button>
 
-      <button class="card blue">
+      <button class="card ghost" disabled>
         <div class="icon">🗓</div>
         <div class="text">
           <div class="name">Season ticket</div>
-          <div class="desc">Auto-renewing or one-off purchase</div>
+          <div class="desc">Coming soon</div>
         </div>
       </button>
     </div>
 
-    <!-- Lower list -->
-    <div class="list">
-      <div class="row">
-        <span class="row-icon">🎫</span>
+    <section class="list">
+      <div class="row" @click="$router.push('/tickets')">
+        <span class="row-icon">🎟</span>
         <div class="row-text">
-          <div class="row-title">Ticket with a code</div>
-          <div class="row-desc">Redeem a ticket with a code</div>
+          <div class="row-title">Your tickets</div>
+          <div class="row-desc">View active tickets</div>
         </div>
       </div>
 
-      <div class="row">
-        <span class="row-icon">🚲</span>
+      <div class="row" @click="$router.push('/settings')">
+        <span class="row-icon">⚙️</span>
         <div class="row-text">
-          <div class="row-title">City bikes</div>
-          <div class="row-desc">Buy a daily, weekly or season pass</div>
+          <div class="row-title">Settings</div>
+          <div class="row-desc">Profile and preferences</div>
         </div>
       </div>
-    </div>
+    </section>
   </div>
 </template>
 
+<script setup>
+import { useUser } from "../composables/useUser";
+const { name } = useUser();
+</script>
+
 <style scoped>
 .wrap {
-  padding: 16px;
-  padding-bottom: 40px;
-  background: #fff;
-  min-height: 100vh;
-  font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  padding: 16px 16px 96px;
 }
-
-/* Tabs */
-.tabs {
-  position: relative;
-  display: flex;
-  gap: 28px;
-  border-bottom: 1px solid #e6e6e6;
-  margin-bottom: 14px;
-}
-.tab {
-  background: none;
-  border: 0;
-  padding: 12px 0 10px;
-  font-size: 18px;
-  font-weight: 700;
-  color: #007ac9;
-}
-.tab.ghost {
-  opacity: .55;
-}
-.underline {
-  position: absolute;
-  bottom: -1px;
-  left: 0;
-  width: 130px;
-  height: 3px;
-  background: #007ac9;
-  border-radius: 3px;
-}
-
-/* Title */
-.title {
+.head h1 {
   font-size: 34px;
-  font-weight: 800;
-  letter-spacing: -0.4px;
-  margin: 12px 0 18px;
+  margin: 6px 0 18px;
+}
+.hi {
+  color: var(--muted);
+  font-weight: 600;
 }
 
-/* Cards */
 .cards {
   display: flex;
   flex-direction: column;
@@ -125,13 +90,19 @@
   gap: 14px;
   align-items: center;
   text-align: left;
+  background: var(--card);
+  box-shadow: 0 6px 16px rgba(0,0,0,.08);
+  animation: pop .25s ease;
 }
 .card.blue {
   background: #007ac9;
   color: white;
 }
-.card:active {
-  transform: scale(0.985);
+.card.ghost {
+  opacity: .5;
+}
+@keyframes pop {
+  from { transform: scale(.97); opacity: 0; }
 }
 
 .icon {
@@ -139,27 +110,24 @@
   text-align: center;
   font-size: 26px;
 }
-
 .name {
   font-size: 20px;
   font-weight: 800;
-  line-height: 1.1;
 }
 .desc {
   font-size: 14px;
   opacity: .9;
 }
 
-/* Lower list */
 .list {
   margin-top: 22px;
-  border-top: 1px solid #e6e6e6;
+  border-top: 1px solid rgba(0,0,0,.1);
 }
 .row {
   display: flex;
   gap: 12px;
   padding: 14px 0;
-  border-bottom: 1px solid #e6e6e6;
+  border-bottom: 1px solid rgba(0,0,0,.1);
   align-items: center;
 }
 .row-icon {
@@ -169,10 +137,9 @@
 }
 .row-title {
   font-weight: 700;
-  color: #007ac9;
 }
 .row-desc {
   font-size: 13px;
-  color: #666;
+  color: var(--muted);
 }
 </style>
