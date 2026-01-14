@@ -14,8 +14,18 @@ const router = useRouter();
 
 onMounted(() => {
   setTimeout(() => {
-    router.replace("/");
-  }, 2500);
+    const tickets = JSON.parse(localStorage.getItem("tickets") || "[]");
+    const id = Date.now();
+
+    tickets.unshift({
+      id,
+      zone: "AB",
+      validUntil: new Date(Date.now() + 60 * 60 * 1000).toLocaleString(),
+    });
+
+    localStorage.setItem("tickets", JSON.stringify(tickets));
+    router.replace(`/tickets/yours?new=${id}`);
+  }, 1800);
 });
 </script>
 
@@ -26,20 +36,17 @@ onMounted(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-family: -apple-system, system-ui, sans-serif;
 }
 .spinner {
   width: 48px;
   height: 48px;
-  border: 4px solid #e6e6e6;
+  border: 4px solid #eee;
   border-top-color: #007ac9;
   border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+  animation: spin .8s linear infinite;
   margin-bottom: 16px;
 }
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+  to { transform: rotate(360deg); }
 }
 </style>
