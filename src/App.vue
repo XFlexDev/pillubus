@@ -1,16 +1,22 @@
 <template>
-  <div class="app">
+  <div :class="['app', theme]">
     <RouterView v-slot="{ Component, route }">
       <transition :name="transitionName">
         <component :is="Component" :key="route.fullPath" />
       </transition>
     </RouterView>
+
+    <BottomNav />
   </div>
 </template>
 
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import BottomNav from "./components/BottomNav.vue";
+import { useUser } from "./composables/useUser";
+
+const { theme } = useUser();
 
 const transitionName = ref("slide-left");
 const router = useRouter();
@@ -26,7 +32,22 @@ router.beforeEach((to, from, next) => {
 <style>
 .app {
   min-height: 100vh;
-  background: white;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+/* Themes */
+.app.light {
+  --bg: #ffffff;
+  --fg: #111111;
+  --card: #ffffff;
+  --muted: #666;
+}
+.app.dark {
+  --bg: #0f0f12;
+  --fg: #f2f2f2;
+  --card: #1a1b20;
+  --muted: #9aa0a6;
 }
 
 /* forward */
