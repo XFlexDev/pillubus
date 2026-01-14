@@ -8,94 +8,103 @@
 
     <!-- Travel zone -->
     <section>
-      <div class="row-head" @click="open = open === 'zone' ? null : 'zone'">
+      <div class="row-head" @click="toggle('zone')">
         <span>Travel zone</span>
         <b>{{ zone.label }}</b>
       </div>
 
-      <div v-if="open === 'zone'" class="panel">
-        <button
-          v-for="z in zones"
-          :key="z.label"
-          class="pill"
-          :class="{ active: zone.label === z.label }"
-          @click="zone = z"
-        >
-          <span>{{ z.label }}</span>
-          <small>{{ z.price.toFixed(2).replace('.', ',') }} €</small>
-        </button>
-      </div>
+      <transition name="accordion">
+        <div v-if="open === 'zone'" class="panel">
+          <button
+            v-for="z in zones"
+            :key="z.label"
+            class="pill"
+            :class="{ active: zone.label === z.label }"
+            @click="zone = z"
+          >
+            <span>{{ z.label }}</span>
+            <small>{{ z.price.toFixed(2).replace('.', ',') }} €</small>
+          </button>
+        </div>
+      </transition>
     </section>
 
     <!-- Customer group -->
     <section>
-      <div class="row-head" @click="open = open === 'group' ? null : 'group'">
+      <div class="row-head" @click="toggle('group')">
         <span>Customer group</span>
         <b>{{ group.label }}</b>
       </div>
 
-      <div v-if="open === 'group'" class="panel list">
-        <button
-          v-for="g in groups"
-          :key="g.label"
-          class="list-item"
-          :class="{ active: group.label === g.label }"
-          @click="group = g"
-        >
-          {{ g.label }}
-        </button>
-      </div>
+      <transition name="accordion">
+        <div v-if="open === 'group'" class="panel list">
+          <button
+            v-for="g in groups"
+            :key="g.label"
+            class="list-item"
+            :class="{ active: group.label === g.label }"
+            @click="group = g"
+          >
+            {{ g.label }}
+          </button>
+        </div>
+      </transition>
     </section>
 
     <!-- Validity -->
     <section>
-      <div class="row-head" @click="open = open === 'time' ? null : 'time'">
+      <div class="row-head" @click="toggle('time')">
         <span>Validity starts</span>
         <b>{{ validity }}</b>
       </div>
 
-      <div v-if="open === 'time'" class="panel list">
-        <button class="list-item" @click="validity = 'Now'">Now</button>
-        <button class="list-item" @click="validity = 'Choose time'">
-          Choose time
-        </button>
-      </div>
+      <transition name="accordion">
+        <div v-if="open === 'time'" class="panel list">
+          <button class="list-item" @click="validity = 'Now'">Now</button>
+          <button class="list-item" @click="validity = 'Choose time'">
+            Choose time
+          </button>
+        </div>
+      </transition>
     </section>
 
     <!-- Payment -->
     <section>
-      <div class="row-head" @click="open = open === 'pay' ? null : 'pay'">
+      <div class="row-head" @click="toggle('pay')">
         <span>Payment method</span>
         <b>{{ payment }}</b>
       </div>
 
-      <div v-if="open === 'pay'" class="panel list">
-        <button class="list-item" @click="payment = 'Visa'">Visa</button>
-        <button class="list-item" @click="payment = 'MasterCard'">
-          MasterCard
-        </button>
-      </div>
+      <transition name="accordion">
+        <div v-if="open === 'pay'" class="panel list">
+          <button class="list-item" @click="payment = 'Visa'">Visa</button>
+          <button class="list-item" @click="payment = 'MasterCard'">
+            MasterCard
+          </button>
+        </div>
+      </transition>
     </section>
 
-    <!-- Spacer -->
     <div style="height:120px"></div>
 
     <!-- Bottom bar -->
     <div class="bar">
-      <div class="price">
-        {{ finalPrice }} €
-      </div>
+      <div class="price">{{ finalPrice }} €</div>
       <button class="cta" @click="confirm = true">Continue</button>
     </div>
 
     <!-- Confirm sheet -->
-    <div v-if="confirm" class="sheet">
-      <div class="sheet-card">
-        <div class="sheet-price">{{ finalPrice }} €</div>
-        <button class="confirm">Confirm payment</button>
-        <button class="cancel" @click="confirm = false">Cancel</button>
+    <transition name="sheet">
+      <div v-if="confirm" class="sheet" @click.self="confirm = false">
+        <div class="sheet-card">
+          <div class="sheet-price">{{ finalPrice }} €</div>
+          <button class="confirm" @click="$router.push('/processing')">
+            Confirm payment
+          </button>
+          <button class="cancel" @click="confirm = false">Cancel</button>
+        </div>
       </div>
-    </div>
+    </transition>
   </div>
 </template>
 
@@ -124,6 +133,10 @@ const validity = ref("Now");
 const payment = ref("Select");
 const open = ref(null);
 const confirm = ref(false);
+
+function toggle(key) {
+  open.value = open.value === key ? null : key;
+}
 
 const finalPrice = computed(() =>
   (zone.value.price * group.value.mul).toFixed(2).replace(".", ",")
@@ -162,9 +175,12 @@ section {
   justify-content: space-between;
   padding: 14px 16px;
 }
+
 .panel {
   padding: 10px 12px 16px;
+  overflow: hidden;
 }
+
 .pill {
   border: 0;
   border-radius: 999px;
@@ -176,6 +192,7 @@ section {
   background: #007ac9;
   color: #fff;
 }
+
 .list-item {
   width: 100%;
   text-align: left;
@@ -189,6 +206,18 @@ section {
   font-weight: 700;
 }
 
+/* Accordion */
+.accordion-enter-active,
+.accordion-leave-active {
+  transition: max-height 0.25s ease, opacity 0.2s ease;
+}
+.accordion-enter-from,
+.accordion-leave-to {
+  max-height: 0;
+  opacity: 0;
+}
+
+/* Bottom bar */
 .bar {
   position: fixed;
   left: 0;
@@ -213,6 +242,7 @@ section {
   font-size: 16px;
 }
 
+/* Sheet */
 .sheet {
   position: fixed;
   inset: 0;
@@ -245,5 +275,16 @@ section {
   background: none;
   border: 0;
   padding: 10px;
+}
+
+/* Sheet animation */
+.sheet-enter-active,
+.sheet-leave-active {
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+.sheet-enter-from,
+.sheet-leave-to {
+  transform: translateY(100%);
+  opacity: 0;
 }
 </style>
