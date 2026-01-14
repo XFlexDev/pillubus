@@ -1,7 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
 
-// Views
-import Home from "../views/Home.vue";
 import TicketsBuy from "../views/TicketsBuy.vue";
 import SingleTicket from "../views/SingleTicket.vue";
 import YourTickets from "../views/YourTickets.vue";
@@ -12,45 +10,15 @@ import Settings from "../views/Settings.vue";
 const router = createRouter({
   history: createWebHistory(),
   routes: [
-    {
-      path: "/",
-      redirect: "/tickets",
-    },
+    { path: "/", redirect: "/tickets" },
 
-    {
-      path: "/home",
-      component: Home,
-    },
+    { path: "/tickets", component: TicketsBuy },
+    { path: "/tickets/single", component: SingleTicket },
+    { path: "/tickets/yours", component: YourTickets },
 
-    {
-      path: "/tickets",
-      component: TicketsBuy,
-    },
-
-    {
-      path: "/tickets/single",
-      component: SingleTicket,
-    },
-
-    {
-      path: "/tickets/yours",
-      component: YourTickets,
-    },
-
-    {
-      path: "/routes",
-      component: Routes,
-    },
-
-    {
-      path: "/more",
-      component: More,
-    },
-
-    {
-      path: "/settings",
-      component: Settings,
-    },
+    { path: "/routes", component: Routes },
+    { path: "/more", component: More },
+    { path: "/settings", component: Settings },
   ],
 });
 
