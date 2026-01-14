@@ -15,14 +15,10 @@ import { useRouter } from "vue-router";
 const transitionName = ref("slide-left");
 const router = useRouter();
 
-let depth = 0;
-
 router.beforeEach((to, from, next) => {
-  const toDepth = to.fullPath.split("/").length;
-  const fromDepth = from.fullPath.split("/").length;
-
+  const toDepth = to.path.split("/").length;
+  const fromDepth = from.path.split("/").length;
   transitionName.value = toDepth > fromDepth ? "slide-left" : "slide-right";
-  depth = toDepth;
   next();
 });
 </script>
@@ -36,26 +32,24 @@ router.beforeEach((to, from, next) => {
 /* forward */
 .slide-left-enter-active,
 .slide-left-leave-active {
-  transition: transform 0.25s ease, opacity 0.25s ease;
+  transition: transform .28s ease;
 }
 .slide-left-enter-from {
   transform: translateX(100%);
 }
 .slide-left-leave-to {
-  transform: translateX(-25%);
-  opacity: 0.6;
+  transform: translateX(-100%);
 }
 
 /* back */
 .slide-right-enter-active,
 .slide-right-leave-active {
-  transition: transform 0.25s ease, opacity 0.25s ease;
+  transition: transform .28s ease;
 }
 .slide-right-enter-from {
   transform: translateX(-100%);
 }
 .slide-right-leave-to {
-  transform: translateX(25%);
-  opacity: 0.6;
+  transform: translateX(100%);
 }
 </style>
