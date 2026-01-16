@@ -1,31 +1,55 @@
 <template>
-  <nav class="nav">
-    <button :class="{ active: is('/') }" @click="go('/')">
-      🏠
-      <span>Home</span>
-    </button>
+  <v-bottom-navigation
+    v-if="visible"
+    grow
+    class="nav"
+    bg-color="surface"
+  >
+    <v-btn
+      :active="is('home')"
+      @click="go('home')"
+      prepend-icon="home"
+      ripple
+    >
+      Home
+    </v-btn>
 
-    <button :class="{ active: is('/tickets') }" @click="go('/tickets')">
-      🎟
-      <span>Tickets</span>
-    </button>
+    <v-btn
+      :active="is('tickets')"
+      @click="go('tickets')"
+      prepend-icon="confirmation_number"
+      ripple
+    >
+      Tickets
+    </v-btn>
 
-    <button :class="{ active: is('/settings') }" @click="go('/settings')">
-      ⚙️
-      <span>Settings</span>
-    </button>
-  </nav>
+    <v-btn
+      :active="is('settings')"
+      @click="go('settings')"
+      prepend-icon="settings"
+      ripple
+    >
+      Settings
+    </v-btn>
+  </v-bottom-navigation>
 </template>
 
 <script setup>
+import { computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 const route = useRoute();
 const router = useRouter();
 
-const is = (p) => route.path === p;
-const go = (p) => {
-  if (route.path !== p) router.push(p);
+const visible = computed(() => {
+  // hide on overlay routes
+  return !["/buy", "/processing"].some(p => route.path.startsWith(p)) &&
+         !route.path.startsWith("/ticket/");
+});
+
+const is = (name) => route.name === name;
+const go = (name) => {
+  if (route.name !== name) router.push({ name });
 };
 </script>
 
@@ -35,25 +59,6 @@ const go = (p) => {
   left: 0;
   right: 0;
   bottom: 0;
-  height: 64px;
-  background: var(--card);
   border-top: 1px solid rgba(0,0,0,.08);
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  z-index: 50;
-}
-button {
-  background: none;
-  border: 0;
-  color: var(--muted);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
-}
-button.active {
-  color: #007ac9;
 }
 </style>
