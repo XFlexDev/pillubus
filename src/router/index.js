@@ -1,20 +1,29 @@
 import { createRouter, createWebHistory } from "vue-router";
 
-import TicketsBuy from "../views/TicketsBuy.vue";
-import SingleTicket from "../views/SingleTicket.vue";
-import PaymentProcessing from "../views/PaymentProcessing.vue";
-import YourTickets from "../views/YourTickets.vue";
-import Ticket from "../views/Ticket.vue";
-import Settings from "../views/Settings.vue";
+import AppShell from "../layouts/AppShell.vue";
+import HomeView from "../views/HomeView.vue";
+import TicketsView from "../views/TicketsView.vue";
+import SettingsView from "../views/SettingsView.vue";
+
+import SingleTicketView from "../views/SingleTicketView.vue";
+import PaymentProcessingView from "../views/PaymentProcessingView.vue";
+import TicketView from "../views/TicketView.vue";
 
 export default createRouter({
   history: createWebHistory(),
   routes: [
-    { path: "/", component: TicketsBuy },
-    { path: "/single", component: SingleTicket },
-    { path: "/processing", component: PaymentProcessing },
-    { path: "/tickets", component: YourTickets },
-    { path: "/ticket/:id", component: Ticket },
-    { path: "/settings", component: Settings },
+    {
+      path: "/",
+      component: AppShell,
+      children: [
+        { path: "", name: "home", component: HomeView },
+        { path: "tickets", name: "tickets", component: TicketsView },
+        { path: "settings", name: "settings", component: SettingsView },
+      ],
+    },
+
+    { path: "/buy", component: SingleTicketView },
+    { path: "/processing", component: PaymentProcessingView },
+    { path: "/ticket/:id", component: TicketView },
   ],
 });
