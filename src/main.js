@@ -1,12 +1,10 @@
 import { createApp } from "vue";
-import { createPinia } from "pinia";
-import router from "./router/index.js";
-import i18n from "./i18n";
 import App from "./App.vue";
-import "./style.css";
+import router from "./router";
+import ripple from "./directives/ripple";
+import "./main.css";
 
-createApp(App)
-  .use(createPinia())
-  .use(router)
-  .use(i18n)
-  .mount("#app");
+const app = createApp(App);
+app.directive("ripple", ripple);
+app.use(router);
+app.mount("#app");
